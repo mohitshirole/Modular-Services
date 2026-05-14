@@ -1,0 +1,25 @@
+# Root Secrets
+.env
+*.env.*
+
+# Local Data Persistence (Critial)
+# We ignore these because we want to preserve local data on the server
+# and not bloat the repository with SQLite files or uploaded assets.
+**/data/*.sqlite
+**/data/*.sqlite-journal
+**/uploads/
+**/logs/
+*.log
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# OS/IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Docker
+.dockerignore

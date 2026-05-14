@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # --- INFRASTRUCTURE ---
+
+  gateway:
+    build: ./gateway
+    container_name: modular-gateway
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - modular-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: modular-tunnel
+    restart: always
+    command: tunnel run --token ${TUNNEL_TOKEN}
+    networks:
+      - modular-network
+    depends_on:
+      - gateway
+
+  # --- MICROSERVICES ---
+
+  identity:
+    build: ./identity
+    container_name: identity-gateway
+    restart: always
+    environment:
+      - PORT=4004
+      - JWT_SECRET=${GLOBAL_JWT_SECRET}
+      - JWT_EXPIRES_IN=${GLOBAL_JWT_EXPIRES}
+      - AUTHENTIK_DISCOVERY_URL=${AUTHENTIK_DISCOVERY_URL}
+      - AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID}
+      - AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET}
+      - AUTHENTIK_REDIRECT_URI=${AUTHENTIK_REDIRECT_URI}
+      - AUTH_SUCCESS_REDIRECT=${AUTH_SUCCESS_REDIRECT}
+      - AUTH_FAILURE_REDIRECT=${AUTH_FAILURE_REDIRECT}
+      - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+    networks:
+      - modular-network
+
+  tally:
+    build: ./tally
+    container_name: tally-gateway
+    restart: always
+    environment:
+      - PORT=4001
+      - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+    networks:
+      - modular-network
+
+  sheets:
+    build: ./google-sheets
+    container_name: sheets-engine
+    restart: always
+    environment:
+      - PORT=4002
+      - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+    networks:
+      - modular-network
+
+  comm:
+    build: ./communication
+    container_name: comm-gateway
+    restart: always
+    environment:
+      - PORT=4003
+      - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+    networks:
+      - modular-network
+
+  pdf:
+    build: ./pdf-engine
+    container_name: pdf-engine
+    restart: always
+    environment:
+      - PORT=4005
+      - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+    networks:
+      - modular-network
+
+  telemetry:
+    build: ./telemetry
+    container_name: telemetry-engine
+    restart: always
+    environment:
+      - PORT=4006
+      - DB_PATH=/app/data/telemetry.sqlite
+    volumes:
+      - ./telemetry/data:/app/data
+      - ./telemetry/logs:/app/logs
+    networks:
+      - modular-network
+
+  scheduler:
+    build: ./scheduler
+    container_name: scheduler-service
+    restart: always
+    environment:
+      - PORT=4007
+      - DB_PATH=/app/data/scheduler.sqlite
+      - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+    volumes:
+      - ./scheduler/data:/app/data
+      - ./scheduler/logs:/app/logs
+    networks:
+      - modular-network
+
+  payments:
+    build: ./payments
+    container_name: payments-hub
+    restart: always
+    environment:
+      - PORT=4008
+      - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+    networks:
+      - modular-network
+
+  storage:
+    build: ./storage
+    container_name: media-hub
+    restart: always
+    environment:
+      - PORT=4009
+      - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - ./storage/uploads:/app/uploads
+      - ./storage/logs:/app/logs
+    networks:
+      - modular-network
+
+networks:
+  modular-network:
+    driver: bridge
