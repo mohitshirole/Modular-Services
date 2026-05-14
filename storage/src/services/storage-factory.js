@@ -2,12 +2,14 @@ import crypto from 'crypto';
 import { createLocalProvider } from '../providers/local.js';
 import { createS3Provider } from '../providers/s3.js';
 import { createAzureProvider } from '../providers/azure.js';
+import { createGoogleDriveProvider } from '../providers/google-drive.js';
 import logger from '../utils/logger.js';
 
 const STORAGE_FACTORIES = {
   'local': createLocalProvider,
   's3': createS3Provider,
   'azure': createAzureProvider,
+  'google-drive': createGoogleDriveProvider,
 };
 
 class StorageFactory {
