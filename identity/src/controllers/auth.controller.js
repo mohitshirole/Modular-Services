@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import authentikService from '../services/authentik.service.js';
 import logger from '../utils/logger.js';
 import crypto from 'crypto';
+import { reportEvent } from '../utils/telemetry.js';
 
 /**
  * Initiate Login: Redirect user to Authentik
@@ -23,9 +24,11 @@ export const login = async (req, res) => {
     const state = crypto.randomBytes(16).toString('hex');
     const authUrl = await authentikService.getAuthUrl(state);
     
+    await reportEvent('AUTH_INITIATED', 'info', { redirect_uri });
     res.redirect(authUrl);
   } catch (error) {
     logger.error(`Login Error: ${error.message}`);
+    await reportEvent('AUTH_INIT_ERROR', 'error', { error: error.message });
     res.status(500).json({ success: false, message: "Could not initiate login" });
   }
 };
@@ -52,6 +55,7 @@ export const callback = async (req, res) => {
     });
 
     logger.info(`User logged in via Authentik: ${userinfo.email}`);
+    await reportEvent('AUTH_CALLBACK_SUCCESS', 'info', { email: userinfo.email });
 
     // Retrieve the original redirect target from the cookie, or fallback to default
     const targetUrl = req.cookies.auth_redirect_target || process.env.AUTH_SUCCESS_REDIRECT;
@@ -64,6 +68,7 @@ export const callback = async (req, res) => {
     res.redirect(`${targetUrl}${separator}token=${token}`);
   } catch (error) {
     logger.error(`Callback Error: ${error.message}`);
+    await reportEvent('AUTH_CALLBACK_ERROR', 'error', { error: error.message });
     res.redirect(process.env.AUTH_FAILURE_REDIRECT);
   }
 };
@@ -79,8 +84,9 @@ export const verifyToken = (req, res) => {
     return res.status(401).json({ success: false, message: "No token provided" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
     if (err) {
+      await reportEvent('TOKEN_VERIFICATION_FAILED', 'warn', { error: err.message });
       return res.status(403).json({ success: false, message: "Invalid or expired token" });
     }
     res.json({ success: true, user });

@@ -1,6 +1,7 @@
 import { getTemplate } from '../templates/index.js';
 import { executeTallyRequest } from '../services/tally-gateway.service.js';
 import logger from '../utils/logger.js';
+import { reportEvent } from '../utils/telemetry.js';
 
 /**
  * Main Controller for Tally Operations
@@ -24,6 +25,8 @@ export const executeReport = async (req, res) => {
       config,
     });
 
+    await reportEvent('TALLY_REPORT_EXECUTED', 'info', { reportId, company: params?.company });
+
     // 4. Return the parsed JSON
     return res.json({
       success: true,
@@ -32,6 +35,7 @@ export const executeReport = async (req, res) => {
     });
   } catch (error) {
     logger.error(`[Tally Controller] Error executing ${reportId}: ${error.message}`);
+    await reportEvent('TALLY_REPORT_FAILED', 'error', { reportId, error: error.message });
     return res.status(500).json({
       success: false,
       message: error.message,

@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment Secrets
+.env
+*.local
+
+# Local Assets & Storage
+uploads/
+temp/
+
+# Logs
+logs/
+*.log
+
+# System
+.DS_Store
+Thumbs.db
