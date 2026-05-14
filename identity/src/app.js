@@ -28,6 +28,15 @@ app.use((req, res, next) => {
 app.use('/api/v1/auth', authRoutes);
 
 // Health Check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'UP',
+    service: 'identity-gateway',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Health Check
 app.get('/', (req, res) => {
   res.json({
     service: 'Identity Gateway',

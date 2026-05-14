@@ -9,7 +9,7 @@ const Event = sequelize.define('Event', {
   },
   appId: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
     comment: 'The application initiating the request (e.g., CRM, Dashboard)'
   },
   userId: {
@@ -22,7 +22,7 @@ const Event = sequelize.define('Event', {
     allowNull: false,
     comment: 'The microservice used (e.g., PDF-Engine, Tally-Gateway)'
   },
-  action: {
+  event: {
     type: DataTypes.STRING,
     allowNull: false,
     comment: 'Specific action performed (e.g., RENDER_PDF, SYNC_TALLY)'

@@ -39,8 +39,8 @@ export const executeTallyRequest = async ({ xmlBody, tallyUrl, config = {} }) =>
     if (error.code === 'ECONNABORTED') {
       throw new Error(`Tally request timed out after ${timeout}ms`);
     }
-    
-    const message = error.response?.data || error.message;
-    throw new Error(`Tally Gateway Error: ${message}`);
+    const status = error.response?.status;
+    const details = error.response?.data || error.message || String(error);
+    throw new Error(status ? `[Tally ${status}] ${details}` : details);
   }
 };

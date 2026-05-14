@@ -29,6 +29,15 @@ app.use((req, res, next) => {
 app.use('/api/v1/pdf', pdfRoutes);
 
 // Health Check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'UP',
+    service: 'pdf-engine',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Health Check
 app.get('/', (req, res) => {
   res.json({
     service: 'PDF Rendering Engine',

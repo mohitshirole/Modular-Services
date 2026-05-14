@@ -34,11 +34,12 @@ export const executeReport = async (req, res) => {
       data: result,
     });
   } catch (error) {
-    logger.error(`[Tally Controller] Error executing ${reportId}: ${error.message}`);
-    await reportEvent('TALLY_REPORT_FAILED', 'error', { reportId, error: error.message });
+    const errorMessage = error.response?.data || error.message;
+    logger.error(`[Tally Controller] Error executing ${reportId}: ${errorMessage}`);
+    await reportEvent('TALLY_REPORT_FAILED', 'error', { reportId, error: errorMessage });
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: errorMessage,
     });
   }
 };

@@ -26,6 +26,15 @@ app.use((req, res, next) => {
 app.use('/api/v1/payments', paymentsRoutes);
 
 // Health Check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'UP',
+    service: 'payments-hub',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Health Check
 app.get('/', (req, res) => {
   res.json({
     service: 'Payment Gateway Hub',

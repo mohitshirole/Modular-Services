@@ -30,6 +30,15 @@ app.use((req, res, next) => {
 app.use('/api/v1/telemetry', telemetryRoutes);
 
 // Health Check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'UP',
+    service: 'telemetry-engine',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Health Check
 app.get('/', (req, res) => {
   res.json({
     service: 'Telemetry & Audit Engine',

@@ -4,10 +4,10 @@ import { z } from 'zod';
  * Event Log Schema
  */
 export const eventSchema = z.object({
-  appId: z.string({ required_error: "appId is required" }),
+  appId: z.string().optional(),
   userId: z.string().optional(),
   service: z.string({ required_error: "service name is required" }),
-  action: z.string({ required_error: "action name is required" }),
+  event: z.string({ required_error: "event name is required" }),
   status: z.enum(['SUCCESS', 'FAILED', 'PENDING']).optional().default('SUCCESS'),
   duration: z.number().optional(),
   metadata: z.record(z.any()).optional().default({})

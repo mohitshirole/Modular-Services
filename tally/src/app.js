@@ -25,6 +25,15 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/v1/tally', tallyRoutes);
 
+// Health Check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'UP',
+    service: 'tally-gateway',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Base Route
 app.get('/', (req, res) => {
   res.json({

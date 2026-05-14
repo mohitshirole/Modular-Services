@@ -14,7 +14,7 @@ export const connectDB = async () => {
   try {
     await sequelize.authenticate();
     // Sync models in development
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
     logger.info('✔ Telemetry SQLite Database connected and synced');
   } catch (error) {
     logger.error('Unable to connect to the SQLite database:', error);

@@ -49,6 +49,8 @@ services:
     environment:
       - PORT=4001
       - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - modular-network
 

@@ -34,6 +34,15 @@ const startApp = async () => {
     app.use('/api/v1/scheduler', schedulerRoutes);
 
     // Health Check
+    app.get('/health', (req, res) => {
+      res.json({
+        status: 'UP',
+        service: 'scheduler-service',
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // Health Check
     app.get('/', (req, res) => {
       res.json({
         service: 'Workflow & Scheduler Engine',
