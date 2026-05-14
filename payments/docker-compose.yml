@@ -1,0 +1,22 @@
+services:
+  payments:
+    build: .
+    container_name: payments-hub
+    restart: always
+    env_file: .env
+    networks:
+      - payments-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: payments-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - payments-network
+    depends_on:
+      - payments
+
+networks:
+  payments-network:
+    driver: bridge

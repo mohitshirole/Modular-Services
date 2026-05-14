@@ -1,0 +1,22 @@
+services:
+  identity:
+    build: .
+    container_name: identity-gateway
+    restart: always
+    env_file: .env
+    networks:
+      - identity-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: identity-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - identity-network
+    depends_on:
+      - identity
+
+networks:
+  identity-network:
+    driver: bridge

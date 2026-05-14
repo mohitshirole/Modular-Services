@@ -1,7 +1,6 @@
 import storageFactory from '../services/storage-factory.js';
 import { processImage } from '../services/image-processor.js';
 import logger from '../utils/logger.js';
-import { reportEvent } from '../utils/telemetry.js';
 
 /**
  * Handle File Upload
@@ -36,15 +35,12 @@ export const uploadFile = async (req, res) => {
     });
 
     if (result.success) {
-      await reportEvent('FILE_UPLOADED', 'info', { provider: providerName, folder, originalName: req.file.originalname });
       res.status(201).json(result);
     } else {
-      await reportEvent('UPLOAD_FAILED', 'error', { provider: providerName, error: result.error });
       res.status(400).json(result);
     }
   } catch (error) {
     logger.error(`Controller Upload Error: ${error.message}`);
-    await reportEvent('UPLOAD_ERROR', 'error', { error: error.message });
     res.status(500).json({ success: false, message: "Upload failed" });
   }
 };
@@ -63,10 +59,8 @@ export const getSignedUrl = async (req, res) => {
     }
 
     const result = await provider.getSignedUrl(key, expires);
-    await reportEvent('SIGNED_URL_GENERATED', 'info', { provider: providerName, key });
     res.json(result);
   } catch (error) {
-    await reportEvent('SIGNED_URL_ERROR', 'error', { error: error.message });
     res.status(500).json({ success: false, message: "Failed to generate URL" });
   }
 };

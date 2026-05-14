@@ -1,0 +1,25 @@
+services:
+  telemetry:
+    build: .
+    container_name: telemetry-engine
+    restart: always
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - telemetry-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: telemetry-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - telemetry-network
+    depends_on:
+      - telemetry
+
+networks:
+  telemetry-network:
+    driver: bridge

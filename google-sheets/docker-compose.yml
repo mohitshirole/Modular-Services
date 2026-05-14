@@ -1,0 +1,22 @@
+services:
+  sheets:
+    build: .
+    container_name: sheets-engine
+    restart: always
+    env_file: .env
+    networks:
+      - sheets-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: sheets-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - sheets-network
+    depends_on:
+      - sheets
+
+networks:
+  sheets-network:
+    driver: bridge

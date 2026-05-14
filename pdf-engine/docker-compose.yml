@@ -1,0 +1,22 @@
+services:
+  pdf:
+    build: .
+    container_name: pdf-engine
+    restart: always
+    env_file: .env
+    networks:
+      - pdf-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: pdf-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - pdf-network
+    depends_on:
+      - pdf
+
+networks:
+  pdf-network:
+    driver: bridge

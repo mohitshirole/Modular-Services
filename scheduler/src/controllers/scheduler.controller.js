@@ -1,7 +1,6 @@
 import Job from '../models/job.model.js';
 import schedulerService from '../services/scheduler.service.js';
 import logger from '../utils/logger.js';
-import { reportEvent } from '../utils/telemetry.js';
 
 /**
  * Create and Schedule a Job
@@ -15,11 +14,9 @@ export const createJob = async (req, res) => {
       schedulerService.scheduleJob(job);
     }
 
-    await reportEvent('JOB_CREATED', 'info', { name: job.name, cron: job.cron });
     res.status(201).json({ success: true, data: job });
   } catch (error) {
     logger.error(`Create Job Error: ${error.message}`);
-    await reportEvent('JOB_CREATE_FAILED', 'error', { error: error.message });
     res.status(500).json({ success: false, message: "Failed to create job" });
   }
 };

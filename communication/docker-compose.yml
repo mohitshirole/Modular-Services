@@ -1,0 +1,22 @@
+services:
+  comm:
+    build: .
+    container_name: comm-gateway
+    restart: always
+    env_file: .env
+    networks:
+      - comm-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: comm-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - comm-network
+    depends_on:
+      - comm
+
+networks:
+  comm-network:
+    driver: bridge

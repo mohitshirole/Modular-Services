@@ -1,0 +1,25 @@
+services:
+  storage:
+    build: .
+    container_name: media-hub
+    restart: always
+    env_file: .env
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    networks:
+      - storage-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: storage-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - storage-network
+    depends_on:
+      - storage
+
+networks:
+  storage-network:
+    driver: bridge

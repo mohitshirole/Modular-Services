@@ -1,0 +1,24 @@
+services:
+  tally:
+    build: .
+    container_name: tally-gateway
+    restart: always
+    env_file: .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - tally-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: tally-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - tally-network
+    depends_on:
+      - tally
+
+networks:
+  tally-network:
+    driver: bridge

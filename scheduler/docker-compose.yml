@@ -1,0 +1,25 @@
+services:
+  scheduler:
+    build: .
+    container_name: scheduler-service
+    restart: always
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - scheduler-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: scheduler-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - scheduler-network
+    depends_on:
+      - scheduler
+
+networks:
+  scheduler-network:
+    driver: bridge
