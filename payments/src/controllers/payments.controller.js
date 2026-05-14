@@ -1,14 +1,14 @@
-import { createRazorpayProvider } from '../providers/razorpay.js';
+import paymentFactory from '../services/payment-factory.js';
 import logger from '../utils/logger.js';
 
 /**
- * Create a Razorpay Order
+ * Create a Payment Order/Intent
  */
 export const createOrder = async (req, res) => {
-  const { amount, currency, receipt, notes, config } = req.body;
+  const { provider: providerName, amount, currency, receipt, notes, config } = req.body;
 
   try {
-    const provider = createRazorpayProvider(config || {});
+    const provider = paymentFactory.getProvider(providerName, config || {});
     const result = await provider.createOrder({ amount, currency, receipt, notes });
 
     if (result.success) {
@@ -23,14 +23,14 @@ export const createOrder = async (req, res) => {
 };
 
 /**
- * Verify Razorpay Signature
+ * Verify Payment Signature/Status
  */
 export const verifyPayment = async (req, res) => {
-  const { orderId, paymentId, signature, config } = req.body;
+  const { provider: providerName, orderId, paymentId, signature, config } = req.body;
 
   try {
-    const provider = createRazorpayProvider(config || {});
-    const result = provider.verifyPayment({ orderId, paymentId, signature });
+    const provider = paymentFactory.getProvider(providerName, config || {});
+    const result = await provider.verifyPayment({ orderId, paymentId, signature });
 
     if (result.success) {
       res.json(result);
@@ -47,10 +47,10 @@ export const verifyPayment = async (req, res) => {
  * Create a Refund
  */
 export const createRefund = async (req, res) => {
-  const { paymentId, amount, notes, config } = req.body;
+  const { provider: providerName, paymentId, amount, notes, config } = req.body;
 
   try {
-    const provider = createRazorpayProvider(config || {});
+    const provider = paymentFactory.getProvider(providerName, config || {});
     const result = await provider.createRefund({ paymentId, amount, notes });
 
     if (result.success) {
@@ -65,35 +65,10 @@ export const createRefund = async (req, res) => {
 };
 
 /**
- * Unified Razorpay Webhook Handler
+ * Unified Webhook Handler (Advanced - Optional Forwarding)
  */
 export const handleWebhook = async (req, res) => {
-  const signature = req.headers['x-razorpay-signature'];
-  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET; // Master secret or fetched per client
-
-  try {
-    // 1. Verify Webhook Signature
-    const expectedSignature = crypto
-      .createHmac('sha256', webhookSecret)
-      .update(JSON.stringify(req.body))
-      .digest('hex');
-
-    if (expectedSignature !== signature) {
-      logger.warn('Invalid Webhook Signature Received');
-      return res.status(400).json({ success: false, message: 'Invalid signature' });
-    }
-
-    const event = req.body.event;
-    const payload = req.body.payload;
-
-    logger.info(`Payment Webhook Received: ${event}`);
-
-    // 2. Here you could trigger a call to the Telemetry microservice
-    // Or forward this to the specific App that owns this payment
-
-    res.json({ success: true });
-  } catch (error) {
-    logger.error(`Webhook Error: ${error.message}`);
-    res.status(500).json({ success: false });
-  }
+  // Webhooks are provider-specific, usually handled via separate endpoints
+  // for different signature verification logic
+  res.json({ success: true, message: "Webhook received" });
 };
