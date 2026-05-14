@@ -9,6 +9,7 @@ import { createUltraMsgProvider } from '../providers/whatsapp/ultramsg.js';
 import { createInteraktProvider } from '../providers/whatsapp/interakt.js';
 import { createDoubleTickProvider } from '../providers/whatsapp/doubletick.js';
 import { createMetaProvider } from '../providers/whatsapp/meta-official.js';
+import { createSlackProvider } from '../providers/slack.js';
 import logger from '../utils/logger.js';
 
 const PROVIDER_FACTORIES = {
@@ -22,6 +23,7 @@ const PROVIDER_FACTORIES = {
   'interakt': createInteraktProvider,
   'doubletick': createDoubleTickProvider,
   'meta': createMetaProvider,
+  'slack': createSlackProvider,
 };
 
 /**
