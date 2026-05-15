@@ -3,12 +3,13 @@ services:
     build: .
     container_name: tally-gateway
     restart: always
+    ports:
+      - "4001:4001"
     env_file: .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       - tally-network
-
   tunnel:
     image: cloudflare/cloudflared:latest
     container_name: tally-tunnel
