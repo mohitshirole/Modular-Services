@@ -3,6 +3,8 @@ import { allLedgersTemplate } from './all-ledgers.js';
 import { marketingExpensesTemplate } from './marketing-expenses.js';
 import { ledgerMonthlySummaryTemplate } from './ledger-monthly-summary.js';
 import { tdsReceivableTemplate } from './tds-receivable.js';
+import { genericGroupSummaryTemplate } from './generic-group-summary.js';
+import { genericVoucherCollectionTemplate } from './generic-voucher-collection.js';
 
 /**
  * Report Registry
@@ -14,6 +16,9 @@ const registry = {
   ALL_LEDGERS: allLedgersTemplate,
   LEDGER_MONTHLY_SUMMARY: ledgerMonthlySummaryTemplate,
   TDS_RECEIVABLE: tdsReceivableTemplate,
+  GROUP_SUMMARY: genericGroupSummaryTemplate,
+  LEDGER_VOUCHERS: genericVoucherCollectionTemplate,
+  TDL_CUSTOM: genericVoucherCollectionTemplate,
 };
 
 /**
