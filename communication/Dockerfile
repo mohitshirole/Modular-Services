@@ -11,8 +11,16 @@ WORKDIR /app
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/src ./src
 RUN npm ci --only=production
-RUN mkdir -p logs && chown -R node:node /app
-USER node
+
+# Create a non-root user with UID 1001 and set up log directory ownership
+RUN addgroup -g 1001 appgroup && \
+    adduser -D -u 1001 -G appgroup appuser && \
+    mkdir -p /app/logs && \
+    chown -R 1001:1001 /app
+
+# Use non-root user for security
+USER 1001
+
 ENV NODE_ENV=production
 ENV PORT=4003
 EXPOSE 4003
