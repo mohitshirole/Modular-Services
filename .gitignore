@@ -23,3 +23,13 @@ Thumbs.db
 
 # Docker
 .dockerignore
+
+# Other services ignored
+gateway/
+identity/
+payments/
+pdf-engine/
+scheduler/
+storage/
+telemetry/
+
