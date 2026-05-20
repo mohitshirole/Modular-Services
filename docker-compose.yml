@@ -3,14 +3,14 @@ version: '3.8'
 services:
   # --- INFRASTRUCTURE ---
 
-  # gateway:
-  #   build: ./gateway
-  #   container_name: modular-gateway
-  #   restart: always
-  #   ports:
-  #     - "80:80"
-  #   networks:
-  #     - modular-network
+  gateway:
+    build: ./gateway
+    container_name: modular-gateway
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - modular-network
 
   tunnel:
     image: cloudflare/cloudflared:latest
@@ -19,38 +19,35 @@ services:
     command: tunnel run --token ${TUNNEL_TOKEN}
     networks:
       - modular-network
-    # depends_on:
-    #   - gateway
+    depends_on:
+      - gateway
 
-    # --- MICROSERVICES ---
+  # --- MICROSERVICES ---
 
-    # identity:
-    #   build: ./identity
-    #   container_name: identity-gateway
-    #   restart: always
-    #   environment:
-    #     - PORT=4004
-    #     - JWT_SECRET=${GLOBAL_JWT_SECRET}
-    #     - JWT_EXPIRES_IN=${GLOBAL_JWT_EXPIRES}
-    #     - AUTHENTIK_DISCOVERY_URL=${AUTHENTIK_DISCOVERY_URL}
-    #     - AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID}
-    #     - AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET}
-    #     - AUTHENTIK_REDIRECT_URI=${AUTHENTIK_REDIRECT_URI}
-    #     - AUTH_SUCCESS_REDIRECT=${AUTH_SUCCESS_REDIRECT}
-    #     - AUTH_FAILURE_REDIRECT=${AUTH_FAILURE_REDIRECT}
-    #     - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
-    #   networks:
-    #     - modular-network
+  # identity:
+  #   build: ./identity
+  #   container_name: identity-gateway
+  #   restart: always
+  #   environment:
+  #     - PORT=4004
+  #     - JWT_SECRET=${GLOBAL_JWT_SECRET}
+  #     - JWT_EXPIRES_IN=${GLOBAL_JWT_EXPIRES}
+  #     - AUTHENTIK_DISCOVERY_URL=${AUTHENTIK_DISCOVERY_URL}
+  #     - AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID}
+  #     - AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET}
+  #     - AUTHENTIK_REDIRECT_URI=${AUTHENTIK_REDIRECT_URI}
+  #     - AUTH_SUCCESS_REDIRECT=${AUTH_SUCCESS_REDIRECT}
+  #     - AUTH_FAILURE_REDIRECT=${AUTH_FAILURE_REDIRECT}
+  #     - TELEMETRY_URL=${GLOBAL_TELEMETRY_URL}
+  #   networks:
+  #     - modular-network
 
   tally:
     build: ./tally
     container_name: tally-gateway
     restart: always
-    ports:
-      - "7711:7711"
     environment:
-      - PORT=7711
-
+      - PORT=4001
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -60,10 +57,8 @@ services:
     build: ./google-sheets
     container_name: sheets-engine
     restart: always
-    ports:
-      - "7712:7712"
     environment:
-      - PORT=7712
+      - PORT=4002
     networks:
       - modular-network
 
@@ -71,10 +66,8 @@ services:
     build: ./communication
     container_name: comm-gateway
     restart: always
-    ports:
-      - "7713:7713"
     environment:
-      - PORT=7713
+      - PORT=4003
     networks:
       - modular-network
   # pdf:
