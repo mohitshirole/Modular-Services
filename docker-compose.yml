@@ -48,6 +48,8 @@ services:
     restart: always
     environment:
       - PORT=4001
+    volumes:
+      - ./tally/logs:/app/logs
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -59,6 +61,8 @@ services:
     restart: always
     environment:
       - PORT=4002
+    volumes:
+      - ./google-sheets/logs:/app/logs
     networks:
       - modular-network
 
@@ -68,6 +72,8 @@ services:
     restart: always
     environment:
       - PORT=4003
+    volumes:
+      - ./communication/logs:/app/logs
     networks:
       - modular-network
   # pdf:
