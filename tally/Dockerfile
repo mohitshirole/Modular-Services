@@ -22,14 +22,11 @@ COPY --from=build /app/src ./src
 # Install only production dependencies
 RUN npm ci --only=production
 
-# Create a non-root user with UID 1001 and set up log directory ownership
-RUN addgroup -g 1001 appgroup && \
-    adduser -D -u 1001 -G appgroup appuser && \
-    mkdir -p /app/logs && \
-    chown -R 1001:1001 /app
+# Create logs directory
+RUN mkdir -p logs && chown -R node:node /app
 
 # Use non-root user for security
-USER 1001
+USER node
 
 ENV NODE_ENV=production
 ENV PORT=4001
